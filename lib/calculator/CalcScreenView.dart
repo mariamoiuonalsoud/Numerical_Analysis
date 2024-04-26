@@ -198,10 +198,15 @@ class _CalculatorScreenState extends State<CalculatorScreen> implements Calculat
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 MyButton(
+                                    title: "sqrt(",
+                                    type: "math",
+                                    changeTitleOnScreen: changeTitleOnScreen),
+                                MyButton(
                                     title: "Home",
                                     type: "op",
                                     changeTitleOnScreen: changeTitleOnScreen
                                 ),
+
                               ],
                             )
                         ),
