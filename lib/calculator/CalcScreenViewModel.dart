@@ -20,7 +20,7 @@ class CalculatorScreenViewModel extends ChangeNotifier{
       onPressE();
       return ;
     }
-    if (title == "sin(" || title == "cos(" || title == "tan(" || title == "log10(" ){
+    if (title == "sin(" || title == "cos(" || title == "tan(" || title == "log10("|| title == "sqrt(" ){
       onPressEquation(title);
       return;
     }
