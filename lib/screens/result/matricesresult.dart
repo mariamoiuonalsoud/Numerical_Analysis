@@ -35,7 +35,7 @@ class MatricesResultScreen extends StatelessWidget {
         ),
         body: Consumer<MatricesProvider>(
           builder: (context, value, child) {
-            if (value.type == 'Gauss Elimination') {
+            if (value.type == 'Gauss Elimination without Partial Pivoting') {
               return GridView(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2, childAspectRatio: 1.5),
@@ -112,7 +112,84 @@ class MatricesResultScreen extends StatelessWidget {
                   ),
                 ],
               );
-            } else if (value.type == "Gauss Jordan") {
+            } else if (value.type == 'Gauss Elimination with Partial Pivoting') {
+              return GridView(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2, childAspectRatio: 1.5),
+                shrinkWrap: true,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(50.0),
+                    child: Row(
+                      children: [
+                        const Text(
+                          "A/B = ",
+                          style: TextStyle(
+                              color: Colors.blueGrey,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        MatrixViewWidget(value.matrices[0])
+                      ],
+                    ),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      MatrixText(
+                          "M21 = a21 / a11 = ${value.matrices[0].rowTwo[0]} / ${value.matrices[0].rowOne[0]} =  ${value.m21}"),
+                      MatrixText(
+                          "M31 = a31 / a11 = ${value.matrices[0].rowThree[0]} / ${value.matrices[0].rowOne[0]} =  ${value.m31}"),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: Row(
+                      children: [
+                        const Text(
+                          "A/B = ",
+                          style: TextStyle(
+                              color: Colors.blueGrey,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Expanded(child: MatrixViewWidget(value.matrices[1]))
+                      ],
+                    ),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      MatrixText(
+                          "M32 = a32 / a22 = ${value.matrices[1].rowTwo[1]} / ${value.matrices[1].rowThree[1]} =  ${value.m32}")
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: Row(
+                      children: [
+                        const Text(
+                          "A/B = ",
+                          style: TextStyle(
+                              color: Colors.blueGrey,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Expanded(child: MatrixViewWidget(value.matrices[2]))
+                      ],
+                    ),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      MatrixText("X1 = ${value.x1}"),
+                      MatrixText("X2 = ${value.x2}"),
+                      MatrixText("X3 = ${value.x3}"),
+                    ],
+                  ),
+                ],
+              );
+            }else if (value.type == "Gauss Jordan without Partial Pivoting") {
               return GridView(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2, childAspectRatio: 1.5),
@@ -278,7 +355,220 @@ class MatricesResultScreen extends StatelessWidget {
                   ),
                 ],
               );
-            } else if (value.type == "LU") {
+            }else if (value.type == "Gauss Jordan with Partial Pivoting") {
+              return GridView(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2, childAspectRatio: 1.5),
+                shrinkWrap: true,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: Row(
+                      children: [
+                        const Text(
+                          "A/B = ",
+                          style: TextStyle(
+                              color: Colors.blueGrey,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        MatrixViewWidget(value.matrices[0])
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: Row(
+                      children: [
+                        const Text(
+                          "A/B = ",
+                          style: TextStyle(
+                              color: Colors.blueGrey,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        MatrixViewWidget(value.matrices[1])
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: Row(
+                      children: [
+                        const Text(
+                          "A/B = ",
+                          style: TextStyle(
+                              color: Colors.blueGrey,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        MatrixViewWidget(value.matrices[2])
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: Row(
+                      children: [
+                        const Text(
+                          "A/B = ",
+                          style: TextStyle(
+                              color: Colors.blueGrey,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        MatrixViewWidget(value.matrices[3])
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: Row(
+                      children: [
+                        const Text(
+                          "A/B = ",
+                          style: TextStyle(
+                              color: Colors.blueGrey,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        MatrixViewWidget(value.matrices[4])
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: Row(
+                      children: [
+                        const Text(
+                          "A/B = ",
+                          style: TextStyle(
+                              color: Colors.blueGrey,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        MatrixViewWidget(value.matrices[5])
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: Row(
+                      children: [
+                        const Text(
+                          "A/B = ",
+                          style: TextStyle(
+                              color: Colors.blueGrey,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        MatrixViewWidget(value.matrices[6])
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: Row(
+                      children: [
+                        const Text(
+                          "A/B = ",
+                          style: TextStyle(
+                              color: Colors.blueGrey,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        MatrixViewWidget(value.matrices[7])
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: Row(
+                      children: [
+                        const Text(
+                          "A/B = ",
+                          style: TextStyle(
+                              color: Colors.blueGrey,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        MatrixViewWidget(value.matrices[8])
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(30.0),
+                    child: Row(
+                      children: [
+                        const Text(
+                          "A/B = ",
+                          style: TextStyle(
+                              color: Colors.blueGrey,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        MatrixViewWidget(value.matrices[9])
+                      ],
+                    ),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      MatrixText("X1 = ${value.x1}"),
+                      MatrixText("X2 = ${value.x2}"),
+                      MatrixText("X3 = ${value.x3}"),
+                    ],
+                  ),
+                ],
+              );
+            }
+            else if (value.type == "LU without Partial Pivoting") {
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    MatrixText("L * C = B"),
+                    Row(
+                      children: [
+                        MatrixViewWidget(value.matrices[0]),
+                        MatrixText("*"),
+                        Expanded(
+                            child: Column(
+                              children: [
+                                MatrixContainer("C1"),
+                                MatrixContainer("C2"),
+                                MatrixContainer("C3"),
+                              ],
+                            )
+                        ),
+                        MatrixText("="),
+                        MatrixViewWidget(value.matrices[1]),
+
+                      ],
+                    ),
+                    MatrixText("U * X = C"),
+                    Row(
+                      children: [
+                        MatrixViewWidget(value.matrices[2]),
+                        MatrixText("*"),
+                        Expanded(
+                            child: Column(
+                              children: [
+                                MatrixContainer("X1"),
+                                MatrixContainer("X2"),
+                                MatrixContainer("X3"),
+                              ],
+                            )
+                        ),
+                        MatrixText("="),
+                        MatrixViewWidget(value.matrices[3]),
+                      ],
+                    ),
+                    MatrixText("X1 = ${value.x1}    ,    X2 = ${value.x2}    ,    X3 = ${value.x3}"),
+                  ],
+                ),
+              );
+            }
+            else if (value.type == "LU with Partial Pivoting") {
               return SingleChildScrollView(
                 child: Column(
                   children: [
