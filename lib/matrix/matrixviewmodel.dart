@@ -6,6 +6,11 @@ import 'matrixnavigator.dart';
 //matrix methods implementation
 class MatriXViewModel extends ChangeNotifier {
 
+  //copy matrices for LU with partial Pivotinh
+  Matrix matrixBeforeSotringR2R3=Matrix();
+  Matrix matrixAfterSotringR2R3=Matrix();
+  Matrix B = Matrix();
+
   Matrix matrix = Matrix();
 
   double x1 = 0;
@@ -105,7 +110,7 @@ class MatriXViewModel extends ChangeNotifier {
   }
   void gaussElimination(){
     List<Matrix> matrices = calcGaussElimination();
-    provider!.updateDataForGauss(x1, x2, x3, m21, m31, m32, matrices, "Gauss Elimination");
+    provider!.updateDataForGauss(x1, x2, x3, m21, m31, m32, matrices, "Gauss Elimination without Partial Pivoting");
     navigator!.goToResultScreen();
   }
 
@@ -114,7 +119,6 @@ class MatriXViewModel extends ChangeNotifier {
     valid();
     List<Matrix> matrices = [];
     matrix.sortMatrixFirstTime();
-    matrix.sortMatrixSecondTime();
     // add the matrix to matrices list
     matrices.add(matrix.copyMatrix());
 
@@ -126,6 +130,7 @@ class MatriXViewModel extends ChangeNotifier {
       matrix.rowTwo[i] = matrix.rowTwo[i] - (m21 * matrix.rowOne[i]);
       matrix.rowThree[i] = matrix.rowThree[i] - (m31 * matrix.rowOne[i]);
     }
+    matrix.sortMatrixSecondTime();
 
     // add the matrix to matrices list
     matrices.add(matrix.copyMatrix());
@@ -146,7 +151,7 @@ class MatriXViewModel extends ChangeNotifier {
   }
   void gaussEliminationPartial(){
     List<Matrix> matrices = calcPartialGaussElimination();
-    provider!.updateDataForGauss(x1, x2, x3, m21, m31, m32, matrices, "Gauss Elimination");
+    provider!.updateDataForGauss(x1, x2, x3, m21, m31, m32, matrices, "Gauss Elimination with Partial Pivoting");
     navigator!.goToResultScreen();
   }
 
@@ -165,16 +170,16 @@ class MatriXViewModel extends ChangeNotifier {
 
 
     // impl the B matrix
-    Matrix B = Matrix();
-    B.rowOne.add(matrices[0].rowOne[3]);
-    B.rowTwo.add(matrices[0].rowTwo[3]);
-    B.rowThree.add(matrices[0].rowThree[3]);
+    Matrix b = Matrix();
+    b.rowOne.add(matrices[0].rowOne[3]);
+    b.rowTwo.add(matrices[0].rowTwo[3]);
+    b.rowThree.add(matrices[0].rowThree[3]);
 
 
     // calc the value of the matrix c
-    double c1 = B.rowOne[0];
-    double c2 = B.rowTwo[0] - (c1 * m21);
-    double c3 = B.rowThree[0] - ((c1 * m31) + (m32 * c2));
+    double c1 = b.rowOne[0];
+    double c2 = b.rowTwo[0] - (c1 * m21);
+    double c3 = b.rowThree[0] - ((c1 * m31) + (m32 * c2));
 
     Matrix C = Matrix();
     C.rowOne.add(c1);
@@ -202,7 +207,7 @@ class MatriXViewModel extends ChangeNotifier {
     matrices = [];
 
     matrices.add(L);
-    matrices.add(B);
+    matrices.add(b);
     matrices.add(U);
     matrices.add(C);
 
@@ -210,32 +215,88 @@ class MatriXViewModel extends ChangeNotifier {
     x2 = (c2 - (U.rowTwo[2] * x3)) / U.rowTwo[1];
     x1 = (c1 - ((U.rowOne[1] * x2) + (U.rowOne[2] * x3))) / U.rowOne[0];
 
-    provider!.updateDataForLU(x1, x2, x3, matrices , "LU");
+    provider!.updateDataForLU(x1, x2, x3, matrices , "LU without Partial Pivoting");
     navigator!.goToResultScreen();
   }
+
+
+  // function to calculate the matrix using gauss elimination with partial pivoting for LU matrix
+  List<Matrix> CalMatrixwithPartialGEforLU(){
+    valid();
+    List<Matrix> matrices = [];
+    matrix.sortMatrixFirstTime();
+
+    // add the matrix to matrices list
+    matrices.add(matrix.copyMatrix());
+    // add b values after sorting R1 with R2 and R3
+    B.rowOne.add(matrices[0].rowOne[3]);
+    B.rowTwo.add(matrices[0].rowTwo[3]);
+    B.rowThree.add(matrices[0].rowThree[3]);
+    // then calc the m21 and m31 to make the the lower triangle is zero
+    m21 = matrix.rowTwo[0] / matrix.rowOne[0];
+    m31 = matrix.rowThree[0] / matrix.rowOne[0];
+
+    for (int i = 0; i < matrix.rowOne.length; i++) {
+      //R2-m21*R1=>R2
+      matrix.rowTwo[i] = matrix.rowTwo[i] - (m21 * matrix.rowOne[i]);
+      //R3-m31*R1=>R3
+      matrix.rowThree[i] = matrix.rowThree[i] - (m31 * matrix.rowOne[i]);
+    }
+
+    // add the matrix to matrices list
+    matrices.add(matrix.copyMatrix());
+    matrixBeforeSotringR2R3=matrix.copyMatrix();
+    //sorting R2 with R3
+    matrix.sortMatrixSecondTime();
+    matrixAfterSotringR2R3=matrix.copyMatrix();
+    m32 = matrix.rowThree[1] / matrix.rowTwo[1];
+
+    for (int i = 0; i < matrix.rowThree.length; i++) {
+      //R3-m32*R2=>R3
+      matrix.rowThree[i] = matrix.rowThree[i] - (m32 * matrix.rowTwo[i]);
+    }
+
+    matrices.add(matrix.copyMatrix());
+
+    x3 = matrix.rowThree[3] / matrix.rowThree[2];
+    x2 = (matrix.rowTwo[3] - (x3 * matrix.rowTwo[2])) / (matrix.rowTwo[1]);
+    x1 = (matrix.rowOne[3] - ((x2 * matrix.rowOne[1]) + (x3 * matrix.rowOne[2]))) / (matrix.rowOne[0]);
+
+    return matrices;
+
+  }
+
+
+
   // function to calculate the matrix using LU with out partial pivoting
 
   void calcMatrixWitPartialLU() {
-    List<Matrix> matrices = calcPartialGaussElimination();
+    List<Matrix> matrices =CalMatrixwithPartialGEforLU();
+
 
     // impl the L matrix
     Matrix L = Matrix();
     L.rowOne = [1, 0, 0];
-    L.rowTwo = [m21, 1, 0];
-    L.rowThree = [m31, m32, 1];
 
+    if(matrixBeforeSotringR2R3?.rowTwo[1]==matrixAfterSotringR2R3?.rowThree[1]&&matrixBeforeSotringR2R3?.rowThree[1]==matrixAfterSotringR2R3?.rowTwo[1]){
+      L.rowTwo = [m31, 1, 0];
+      L.rowThree = [m21, m32, 1];
+      for (int i = 0; i < B.rowTwo.length; i++) {
+        double temp = B.rowTwo[i];
+        B.rowTwo[i] = B.rowThree[i];
+       B. rowThree[i] = temp;
+      }
+    }else if(matrixBeforeSotringR2R3?.rowTwo[1]==matrixAfterSotringR2R3?.rowTwo[1]&&matrixBeforeSotringR2R3?.rowThree[1]==matrixAfterSotringR2R3?.rowThree[1]){
+      L.rowTwo = [m21, 1, 0];
+      L.rowThree = [m31, m32, 1];
+    }
 
-    // impl the B matrix
-    Matrix B = Matrix();
-    B.rowOne.add(matrices[0].rowOne[3]);
-    B.rowTwo.add(matrices[0].rowTwo[3]);
-    B.rowThree.add(matrices[0].rowThree[3]);
 
 
     // calc the value of the matrix c
     double c1 = B.rowOne[0];
-    double c2 = B.rowTwo[0] - (c1 * m21);
-    double c3 = B.rowThree[0] - ((c1 * m31) + (m32 * c2));
+    double c2 = B.rowTwo[0] - (c1 * L.rowTwo[0]);
+    double c3 = B.rowThree[0] - ((c1 * L.rowThree[0]) + (L.rowThree[1] * c2));
 
     Matrix C = Matrix();
     C.rowOne.add(c1);
@@ -271,7 +332,7 @@ class MatriXViewModel extends ChangeNotifier {
     x2 = (c2 - (U.rowTwo[2] * x3)) / U.rowTwo[1];
     x1 = (c1 - ((U.rowOne[1] * x2) + (U.rowOne[2] * x3))) / U.rowOne[0];
 
-    provider!.updateDataForLU(x1, x2, x3, matrices , "LU");
+    provider!.updateDataForLU(x1, x2, x3, matrices , "LU with Partial Pivoting");
     navigator!.goToResultScreen();
   }
 
@@ -339,7 +400,7 @@ class MatriXViewModel extends ChangeNotifier {
     x2 = matrix.rowTwo[3] / matrix.rowTwo[1];
     x3 = matrix.rowThree[3] / matrix.rowThree[2];
 
-    provider!.updateDataForGauss(x1, x2, x3, m21, m31, m32, matrices, "Gauss Jordan");
+    provider!.updateDataForGauss(x1, x2, x3, m21, m31, m32, matrices, "Gauss Jordan without Partial Pivoting");
     navigator!.goToResultScreen();
   }
 
@@ -409,7 +470,7 @@ class MatriXViewModel extends ChangeNotifier {
     x2 = matrix.rowTwo[3] / matrix.rowTwo[1];
     x3 = matrix.rowThree[3] / matrix.rowThree[2];
 
-    provider!.updateDataForGauss(x1, x2, x3, m21, m31, m32, matrices, "Gauss Jordan");
+    provider!.updateDataForGauss(x1, x2, x3, m21, m31, m32, matrices, "Gauss Jordan with Partial Pivoting");
     navigator!.goToResultScreen();
   }
 
